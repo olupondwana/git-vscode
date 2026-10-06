@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10131b">
+  <title>Calculator</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #10131b;
+      color: #f4f5fa;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      background:
+        radial-gradient(ellipse at 20% 15%, #27314a 0, transparent 42%),
+        radial-gradient(ellipse at 85% 90%, #26302e 0, transparent 38%),
+        #10131b;
+    }
+
+    .calculator {
+      width: min(100%, 390px);
+      padding: 26px;
+      border: 1px solid #ffffff14;
+      border-radius: 28px;
+      background: #1b1f2bd9;
+      box-shadow: 0 28px 90px #0008, inset 0 1px #ffffff0b;
+      backdrop-filter: blur(18px);
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      color: #9ba3b8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      letter-spacing: .04em;
+      text-transform: none;
+    }
+
+    .status::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #70d6a3;
+      content: "";
+    }
+
+    .display {
+      min-height: 132px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      overflow: hidden;
+      padding: 14px 2px 22px;
+      text-align: right;
+    }
+
+    .expression {
+      width: 100%;
+      min-height: 26px;
+      overflow: hidden;
+      color: #969fb4;
+      font-size: 17px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .result {
+      max-width: 100%;
+      overflow: hidden;
+      color: #fff;
+      font-size: clamp(40px, 12vw, 58px);
+      font-weight: 550;
+      letter-spacing: -.055em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .message {
+      height: 20px;
+      margin: 0 0 10px;
+      color: #ff9b9b;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 11px;
+    }
+
+    button {
+      min-width: 0;
+      height: 62px;
+      border: 1px solid #ffffff0a;
+      border-radius: 19px;
+      background: #282d3b;
+      color: #f4f5fa;
+      cursor: pointer;
+      font: inherit;
+      font-size: 21px;
+      transition: background .15s ease, transform .15s ease, border-color .15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:hover { background: #343a4b; }
+    button:active { transform: scale(.96); }
+    button:focus-visible { outline: 2px solid #9a8cff; outline-offset: 2px; }
+
+    button.utility {
+      background: #242938;
+      color: #b7bed0;
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    button.operator {
+      background: #302e45;
+      color: #b8aaff;
+      font-size: 25px;
+    }
+
+    button.equals {
+      border-color: #a99aff33;
+      background: linear-gradient(145deg, #9180ff, #7060df);
+      box-shadow: 0 8px 22px #7565ed40;
+      color: white;
+      font-size: 25px;
+    }
+
+    button.equals:hover { background: linear-gradient(145deg, #a294ff, #8171f4); }
+    button.zero { grid-column: span 2; }
+
+    @media (max-width: 360px) {
+      .calculator { padding: 20px; }
+      .keys { gap: 8px; }
+      button { height: 56px; border-radius: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator" aria-label="Calculator">
+    <div class="topline">
+      <span>Calculator</span>
+      <span class="status">Ready</span>
+    </div>
+    <div class="display" aria-live="polite" aria-atomic="true">
+      <div class="expression" id="expression" aria-label="Expression"></div>
+      <div class="result" id="result">0</div>
+    </div>
+    <p class="message" id="message" role="status"></p>
+    <div class="keys">
+      <button class="utility" data-action="clear" aria-label="Clear">AC</button>
+      <button class="utility" data-value="(" aria-label="Open parenthesis">(</button>
+      <button class="utility" data-value=")" aria-label="Close parenthesis">)</button>
+      <button class="operator" data-value="/" aria-label="Divide">÷</button>
+
+      <button data-value="7">7</button>
+      <button data-value="8">8</button>
+      <button data-value="9">9</button>
+      <button class="operator" data-value="*" aria-label="Multiply">×</button>
+
+      <button data-value="4">4</button>
+      <button data-value="5">5</button>
+      <button data-value="6">6</button>
+      <button class="operator" data-value="-" aria-label="Subtract">−</button>
+
+      <button data-value="1">1</button>
+      <button data-value="2">2</button>
+      <button data-value="3">3</button>
+      <button class="operator" data-value="+" aria-label="Add">+</button>
+
+      <button class="utility" data-action="backspace" aria-label="Backspace">⌫</button>
+      <button class="zero" data-value="0">0</button>
+      <button data-value=".">.</button>
+      <button class="equals" data-action="calculate" aria-label="Calculate">=</button>
+    </div>
+  </main>
+  <script>
+    const expressionDisplay = document.querySelector("#expression");
+    const resultDisplay = document.querySelector("#result");
+    const messageDisplay = document.querySelector("#message");
+    let expression = "";
+    let justCalculated = false;
+
+    function render() {
+      expressionDisplay.textContent = "";
+      resultDisplay.textContent = expression || "0";
+    }
+
+    function append(value) {
+      if (justCalculated && /[0-9.(]/.test(value)) expression = "";
+      if (justCalculated && /[+\-*/)]/.test(value)) {
+        const last = expression.at(-1);
+        if (/[+\-*/]/.test(last ?? "")) expression = expression.slice(0, -1);
+      }
+      expression += value;
+      justCalculated = false;
+      messageDisplay.textContent = "";
+      render();
+    }
+
+    async function calculate() {
+      if (!expression.trim()) return;
+      messageDisplay.textContent = "";
+      try {
+        const response = await fetch("/api/calc", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ expression })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || "Calculation failed.");
+        expressionDisplay.textContent = expression.replaceAll("*", "×").replaceAll("/", "÷").replaceAll("-", "−") + " =";
+        resultDisplay.textContent = String(data.result);
+        expression = String(data.result);
+        justCalculated = true;
+      } catch (error) {
+        messageDisplay.textContent = error.message;
+      }
+    }
+
+    function clear() {
+      expression = "";
+      justCalculated = false;
+      messageDisplay.textContent = "";
+      render();
+    }
+
+    function backspace() {
+      expression = expression.slice(0, -1);
+      justCalculated = false;
+      messageDisplay.textContent = "";
+      render();
+    }
+
+    document.querySelector(".keys").addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      if (button.dataset.action === "calculate") calculate();
+      else if (button.dataset.action === "clear") clear();
+      else if (button.dataset.action === "backspace") backspace();
+      else append(button.dataset.value);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (/^[0-9().+\-*/]$/.test(event.key)) append(event.key);
+      else if (event.key === "Enter" || event.key === "=") calculate();
+      else if (event.key === "Backspace") backspace();
+      else if (event.key === "Escape") clear();
+    });
+  </script>
+</body>
+</html>
